@@ -2,11 +2,44 @@ const display = document.getElementById('display');
 const buttonsList = document.querySelectorAll('.digit-btn');
 const operators = document.querySelectorAll('.operator-btn');
 const clearButton = document.querySelector('.clear-btn');
+const backspaceButton = document.querySelector(".backspace-btn")
+
+const decimalButton = [...buttonsList].find(
+  button => button.textContent === "."
+);
 
 let firstNumber = null;
 let secondNumber = null;
 let operatorSymbol = null;
 let isResultOnDisplay = false;
+
+function updateDecimalButton() {
+  decimalButton.disabled = display.textContent.includes(".");
+}
+
+function setDisplay(value) {
+  display.textContent = value;
+  updateDecimalButton();
+}
+
+updateDecimalButton();
+
+if (backspaceButton) {
+  backspaceButton.addEventListener('click', () => {
+    if (isResultOnDisplay) return;
+    if (display.textContent.length === 1) {
+      setDisplay("0");
+    } else {
+      setDisplay(display.textContent.slice(0, -1));
+    }
+    if (operatorSymbol === null) {
+      firstNumber = display.textContent === "0" ? null : display.textContent;
+    } else {
+      secondNumber = display.textContent === "0" ? null : display.textContent;
+    }
+  });
+}
+
 
 buttonsList.forEach(individualButton => {
   individualButton.addEventListener('click', function(e) {
@@ -14,7 +47,7 @@ buttonsList.forEach(individualButton => {
 
     if (isResultOnDisplay) {
       firstNumber = clickedDigit;
-      display.textContent = clickedDigit;
+      setDisplay(clickedDigit);
       secondNumber = null;
       operatorSymbol = null;
       isResultOnDisplay = false;
@@ -29,16 +62,16 @@ buttonsList.forEach(individualButton => {
 
     if (operatorSymbol === null) {
       if (display.textContent === "0") {
-        display.textContent = clickedDigit;
+        setDisplay(clickedDigit === "." ? "0." : clickedDigit);
       } else {
-        display.textContent += clickedDigit;
+        setDisplay(display.textContent + clickedDigit);
       }
       firstNumber = display.textContent;
     } else {
       if (secondNumber === null) {
-        display.textContent = clickedDigit;
+        setDisplay(clickedDigit);
       } else {
-        display.textContent += clickedDigit;
+        setDisplay(display.textContent + clickedDigit);
       }
       secondNumber = display.textContent;
     }
@@ -56,9 +89,8 @@ operators.forEach(specificOperator => {
         return;
       }
 
-
       const result = operate (firstNumber, operatorSymbol, secondNumber);
-      display.textContent = result;
+      setDisplay(result);
 
       firstNumber = result;
       secondNumber = null;
@@ -67,7 +99,7 @@ operators.forEach(specificOperator => {
     } else {
       if (firstNumber !== null && operatorSymbol !== null && secondNumber !== null) {
         const result = operate(firstNumber, operatorSymbol, secondNumber);
-        display.textContent = result;
+        setDisplay(result);
         firstNumber = result;
         secondNumber = null;
       }
@@ -84,15 +116,46 @@ if (clearButton) {
     secondNumber = null;
     operatorSymbol = null;
     isResultOnDisplay = false;
-    display.textContent = "0";
+    setDisplay("0");
   });
 }
 
+document.addEventListener('keydown', (e) => {
+  if ("0123456789.".includes(e.key)) {
+    const button = [...buttonsList].find(
+      button => button.textContent === e.key
+    );
+    if (button) {
+      button.click();
+    }
+  }
+  if ("+-*/".includes(e.key)) {
+    const button = [...operators].find(
+      button => button.textContent === e.key
+    );
+    if (button) {
+      button.click();
+    }
+  }
+  if (e.key === "Enter") {
+    const equalsButton = [...operators].find(
+      button => button.textContent === "="
+    );
+    equalsButton.click();
+  }
+  if (e.key === "Backspace") {
+    e.preventDefault();
+    backspaceButton.click();
+  }
+  if (e.key === "Escape") {
+    clearButton.click();
+  }
+});
+
 const add = (a, b) => a + b;
 const subtract = (a, b) => a - b;
-const sum = (array) => array.reduce((total, current) => total + current, 0);
-const multiply = (array) => array.reduce((product, current) => product * current);
-const divide = (array) => array.reduce((dividend, divisor) => dividend / divisor);
+const multiply = (a, b) => a * b;
+const divide = (a, b) => a / b;
 
 const operate = function(num1, operator, num2) {
   const a = Number(num1);
@@ -114,10 +177,10 @@ const operate = function(num1, operator, num2) {
       finalValue = subtract(a, b);
       break;
     case "*":
-      finalValue = multiply([a, b]);
+      finalValue = multiply(a, b);
       break;
     case "/":
-      finalValue = divide([a, b]);
+      finalValue = divide(a, b);
       break;
     default:
       return "0";
