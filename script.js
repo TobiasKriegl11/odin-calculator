@@ -2,7 +2,8 @@ const display = document.getElementById('display');
 const buttonsList = document.querySelectorAll('.digit-btn');
 const operators = document.querySelectorAll('.operator-btn');
 const clearButton = document.querySelector('.clear-btn');
-const backspaceButton = document.querySelector(".backspace-btn")
+const backspaceButton = document.querySelector('.backspace-btn');
+const equalsButton = document.querySelector('.equals-btn');
 
 const decimalButton = [...buttonsList].find(
   button => button.textContent === "."
@@ -84,31 +85,33 @@ operators.forEach(specificOperator => {
   specificOperator.addEventListener('click', function(e) {
     const clickedOperator = e.target.textContent;
 
-    if (clickedOperator === "=") {
-      if (firstNumber === null || operatorSymbol === null || secondNumber === null) {
-        return;
-      }
-
-      const result = operate (firstNumber, operatorSymbol, secondNumber);
-      setDisplay(result);
-
-      firstNumber = result;
-      secondNumber = null;
-      operatorSymbol = null;
-      isResultOnDisplay = true;
-    } else {
-      if (firstNumber !== null && operatorSymbol !== null && secondNumber !== null) {
+    if (firstNumber !== null && operatorSymbol !== null && secondNumber !== null) {
         const result = operate(firstNumber, operatorSymbol, secondNumber);
         setDisplay(result);
         firstNumber = result;
         secondNumber = null;
       }
 
-      operatorSymbol = clickedOperator;
-      isResultOnDisplay = false;
-    }
+    operatorSymbol = clickedOperator;
+    isResultOnDisplay = false;
   });
 });
+
+if (equalsButton) {
+  equalsButton.addEventListener('click', () => {
+    if (firstNumber === null || operatorSymbol === null || secondNumber === null) {
+      return;
+    }
+
+    const result = operate (firstNumber, operatorSymbol, secondNumber);
+    setDisplay(result);
+
+    firstNumber = result;
+    secondNumber = null;
+    operatorSymbol = null;
+    isResultOnDisplay = true;
+  });
+}
 
 if (clearButton) {
   clearButton.addEventListener('click', () => {
@@ -138,11 +141,10 @@ document.addEventListener('keydown', (e) => {
     }
   }
   if (e.key === "Enter") {
-    const equalsButton = [...operators].find(
-      button => button.textContent === "="
-    );
-    equalsButton.click();
+    e.preventDefault();
+    if (equalsButton) equalsButton.click();
   }
+  
   if (e.key === "Backspace") {
     e.preventDefault();
     backspaceButton.click();
