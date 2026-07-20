@@ -25,21 +25,21 @@ function setDisplay(value) {
 
 updateDecimalButton();
 
-if (backspaceButton) {
-  backspaceButton.addEventListener('click', () => {
-    if (isResultOnDisplay) return;
-    if (display.textContent.length === 1) {
-      setDisplay("0");
-    } else {
-      setDisplay(display.textContent.slice(0, -1));
-    }
-    if (operatorSymbol === null) {
-      firstNumber = display.textContent === "0" ? null : display.textContent;
-    } else {
-      secondNumber = display.textContent === "0" ? null : display.textContent;
-    }
-  });
-}
+
+backspaceButton.addEventListener('click', () => {
+  if (isResultOnDisplay) return;
+  if (display.textContent.length === 1) {
+    setDisplay("0");
+  } else {
+    setDisplay(display.textContent.slice(0, -1));
+  }
+  if (operatorSymbol === null) {
+    firstNumber = display.textContent === "0" ? null : display.textContent;
+  } else {
+    secondNumber = display.textContent === "0" ? null : display.textContent;
+  }
+});
+
 
 
 buttonsList.forEach(individualButton => {
@@ -97,31 +97,27 @@ operators.forEach(specificOperator => {
   });
 });
 
-if (equalsButton) {
-  equalsButton.addEventListener('click', () => {
-    if (firstNumber === null || operatorSymbol === null || secondNumber === null) {
-      return;
-    }
+equalsButton.addEventListener('click', () => {
+  if (firstNumber === null || operatorSymbol === null || secondNumber === null) {
+    return;
+  }
 
-    const result = operate (firstNumber, operatorSymbol, secondNumber);
-    setDisplay(result);
+  const result = operate (firstNumber, operatorSymbol, secondNumber);
+  setDisplay(result);
 
-    firstNumber = result;
-    secondNumber = null;
-    operatorSymbol = null;
-    isResultOnDisplay = true;
-  });
-}
+  firstNumber = result;
+  secondNumber = null;
+  operatorSymbol = null;
+  isResultOnDisplay = true;
+});
 
-if (clearButton) {
-  clearButton.addEventListener('click', () => {
-    firstNumber = null;
-    secondNumber = null;
-    operatorSymbol = null;
-    isResultOnDisplay = false;
-    setDisplay("0");
-  });
-}
+clearButton.addEventListener('click', () => {
+  firstNumber = null;
+  secondNumber = null;
+  operatorSymbol = null;
+  isResultOnDisplay = false;
+  setDisplay("0");
+});
 
 document.addEventListener('keydown', (e) => {
   if ("0123456789.".includes(e.key)) {

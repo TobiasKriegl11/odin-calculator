@@ -40,7 +40,7 @@ body {
     background-color: lightgray;
 }
 
-#row {
+.row {
     display: flex;
     gap: 12px;
 }
